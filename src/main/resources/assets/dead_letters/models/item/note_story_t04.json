@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dead_letters:item/story_pages/story_page_t04"
+  }
+}

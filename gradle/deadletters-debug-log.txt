@@ -1,0 +1,205 @@
+Dead Letters Bugfix/Debug Log
+Last Updated: 2026-04-14
+
+[2026-04-14]
+- Initialized debug log and planning workflow.
+- Added gradle tasks for:
+  - deadLettersPlan
+  - deadLettersDebugLog
+  - buildAndInstallLootrTest
+- Standardized test install target:
+  C:/Users/Ksivi/curseforge/minecraft/Instances/lootr tests/mods
+- Replaced template mod bootstrap with Dead Letters scaffold:
+  - Registered dead_letters:note
+  - Added common config schema for progression/custom stories
+  - Added story/note models and runtime registry snapshot
+  - Added reload listener to load datapack + config stories
+- Added config story format support:
+  - story.json
+  - part_N.txt (simple mode)
+  - part_N.json (advanced mode)
+- Validation currently implemented:
+  - part_1 required
+  - no gaps in part numbering
+- Build/test loop validated:
+  - clean build succeeded
+  - jar copied to Lootr test modpack mods folder
+- Known warnings:
+  - Forge API deprecation warnings for ModLoadingContext.get and FMLJavaModLoadingContext.get (non-blocking on 1.20.1 / 47.4.x).
+
+[2026-04-14]
+- Added debug/testing toolkit scaffolding:
+  - Config flags:
+    - debug.testingMode
+    - debug.logLootDecisions
+  - Commands:
+    - /deadletters debug stories
+    - /deadletters debug roll <count>
+    - /deadletters debug give <noteId>
+- Added first 5 story packs to built-in datapack data:
+  - code_zero
+  - final_broadcast
+  - final_heartbeat
+  - red_horizon_protocol
+  - silent_playground
+- Added custom-story example mirror for player copy/paste:
+  - examples/custom-stories/*
+- Copied note item texture from:
+  - C:/Users/Ksivi/Downloads/book.png
+  into:
+  - src/main/resources/assets/dead_letters/textures/item/note.png
+- Restructured source story examples on Desktop:
+  - C:/Users/Ksivi/Desktop/Dead Letters/Stories/<Story> now uses part_N.txt files
+  - Created safety backup of original single-file versions in:
+    C:/Users/Ksivi/Desktop/Dead Letters/Stories/_original_combined_backup
+
+[2026-04-14]
+- Added per-player progression persistence (ServerPlayer persistent NBT):
+  - progression level per story
+  - discovered note set
+  - per-container injection stamp set
+- Added progression-aware note selection service:
+  - only current part per story is eligible
+  - no duplicates when allowDuplicates=false
+  - weighted by story * note weight
+- Added runtime note injection event:
+  - on first right-click of a randomizable container per player
+  - applies spawnChance
+  - grants selected note item to the player
+- Updated note item behavior:
+  - reading note marks discovered
+  - progression increments on read when order matches current level
+  - note text emitted to chat for now (UI pending)
+- Extended debug commands:
+  - /deadletters debug state
+  - /deadletters debug reset
+- Build loop:
+  - rebuilt Dead Letters and installed fresh jar to Lootr tests instance
+
+[2026-04-14 Lootr Liaison]
+- Added explicit Dead Letters compatibility hook in Lootr Liaison:
+  - compat presence detection + startup log
+- Built Lootr Liaison and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Crashfix]
+- Crash on new world creation fixed.
+- Root cause:
+  - StoryReloadListener initialized INSTANCE before GSON, passing null Gson into SimpleJsonResourceReloadListener constructor.
+  - This caused NPE during resource reload (GsonHelper in SimpleJsonResourceReloadListener).
+- Fix:
+  - Reordered static fields so GSON initializes before INSTANCE.
+- Rebuilt and installed fresh Dead Letters jar to Lootr tests instance.
+
+[2026-04-14 Loader Fix]
+- Debug commands reported 0 stories/0 notes in-game.
+- Root cause:
+  - Datapack loader assumed full path prefix "deadletters/stories/" in resource keys.
+  - SimpleJsonResourceReloadListener provides keys relative to configured directory.
+- Fix:
+  - Updated datapack parser to accept relative resource keys (e.g., "code_zero/story", "code_zero/notes/part_1").
+- Rebuilt and installed fresh Dead Letters jar to Lootr tests instance.
+
+[2026-04-14 Note UI Pass]
+- Split note visual responsibilities:
+  - Item icon now uses plain paper icon (no arrow artifact in hotbar).
+  - Custom note screen now uses provided page texture as GUI background.
+- Added client note screen flow:
+  - Right-click note opens custom screen (client)
+  - Server still handles progression/discovery and note consumption
+- Added GUI texture:
+  - assets/dead_letters/textures/gui/note_page.png
+- Rebuilt and installed fresh Dead Letters jar to Lootr tests instance.
+
+[2026-04-14 Item icon]
+- Added cropped16x16 item texture from gui page (no frame/arrows):
+  - assets/dead_letters/textures/item/note_icon.png
+- Regeneration script: scripts/generate_note_icon.py (edit CROP if layout shifts)
+- note.json uses dead_letters:item/note_icon
+
+[2026-04-14 UI fit pass]
+- Improved note visual fit and readability:
+  - Uses clean page texture crop without stray control arrows:
+    assets/dead_letters/textures/gui/note_page_clean.png
+  - Increased rendered page size on screen.
+  - Added automatic text pagination for long notes.
+  - Added previous/next page buttons and page counter.
+- Improved hotbar/in-hand icon rendering:
+  - item icon now generated as centered 32x32 transparent canvas with preserved aspect.
+  - avoids stretched/warped in-hand appearance.
+
+[2026-04-14 Hotbar texture swap]
+- Replaced note item icon texture with user-provided file:
+  - C:/Users/Ksivi/Downloads/book for hotbar.png
+- Installed fresh jar to Lootr tests instance.
+
+[2026-04-14 UI tiling + naming fix]
+- Fixed right-click note screen texture tiling artifact:
+  - Render now scales via pose matrix (UV remains within texture bounds).
+- Added dynamic note item display name:
+  - "<Story Name> Part <order>" (example: "Code Zero Part 1")
+- Installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Unified texture]
+- Replaced right-click note page texture with user-provided file:
+  - C:/Users/Ksivi/Downloads/book for hotbar.png
+  -> assets/dead_letters/textures/gui/note_page_clean.png
+- Built and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Text fit correction]
+- Fixed top clipping and inconsistent text fit by using a stricter safe text box:
+  - Increased top/side text margins
+  - Removed separate title draw at top
+  - Included title + body in unified pagination flow
+- Built and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Text width bugfix]
+- Root cause of text still too wide:
+  - getTextWidth() incorrectly multiplied by SCALE twice relative to Font.split expectations.
+- Fix:
+  - Corrected writable width to (inner texture width) * SCALE exactly once (no double scale).
+  - Increased horizontal/top padding for this parchment art; LINE_HEIGHT 11 for better vertical use.
+- Built and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Fine left nudge]
+- Asymmetric horizontal padding: MARGIN_X_LEFT 38, MARGIN_X_RIGHT 34 (texture px) to shift text block slightly right vs binding.
+- Built and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Pagination + on-page controls]
+- Pagination is line-capacity based (Font wrapping), which is the correct analogue of a character limit for proportional font metrics.
+- Reserved bottom strip on the parchment for controls so text never collides with next/prev.
+- Replaced off-parchment vanilla buttons with PlainTextButton "<" ">" anchored bottom-left/right of the page art.
+- Rebuild pages on resize so line width stays correct if window size changes.
+- Built and installed fresh jar to Lootr tests instance.
+
+[2026-04-14 Creative tab]
+- Added creative inventory tab "Dead Letters" (dead_letters:notes).
+- Populates one note item stack per loaded NoteDefinition with correct NoteID NBT, sorted by story id then part order.
+- Tab contents reflect StoryRegistry at the time the creative tab is built (after datapack/reload in-game).
+
+[2026-04-14 Release metadata]
+- Dead Letters 1.0: mods.toml now declares mandatory dependencies on Lootr and Lootr Liaison (1.2+); long description lives in build.gradle (Dead Air–style sections).
+- Lootr Liaison bumped to 1.2; CHANGELOG.md updated (Dead Letters compat log line only).
+
+[2026-04-14 License + modpack jar]
+- Confirmed Dead Letters mod_license=MIT (gradle.properties); mods.toml uses ${mod_license}.
+- Rebuilt dead_letters-1.0.jar and installed to lootr tests mods folder.
+
+[2026-04-14 Modpack sync]
+- Installed fresh jars to C:/Users/Ksivi/curseforge/minecraft/Instances/lootr tests/mods:
+  - dead_letters-1.0.jar (buildAndInstallLootrTest)
+  - lootr_liason-1.2.jar (manual copy from Lootr Liason build/libs)
+- Removed obsolete lootr_liason-1.1.jar from same folder to avoid duplicate modid load.
+
+[2026-04-14 Chest inject + duplicate fixes (Discord QA)]
+- LootNoteInjector: notes go into the RandomizableContainerBlockEntity’s first empty slots (not player.addItem); runs next server tick via ServerLevel.getServer().execute so vanilla/Lootr loot fill can finish first; EventPriority.LOWEST; MAIN_HAND only to avoid Forge double-firing both hands.
+- Spawn chance: container stamp (markInjectedContainer) only after a successful spawn roll (no longer locks the chest forever on a failed roll).
+- PlayerStoryData: persistent "acquired" note id list; when allowDuplicates is false, NoteSelector excludes both discovered and acquired; per-chest batch Set excludes picking the same note id twice in one inject when maxNotesPerChest > 1.
+- NoteItem use (server): markAcquired on read; debug give: markAcquired; /deadletters debug state shows acquired count.
+- Overflow: if the container has no empty slot, the note is spawned as an ItemEntity above the block with short pickup delay.
+- Rebuilt dead_letters-1.0.jar via buildAndInstallLootrTest to lootr tests mods folder after these changes.
+
+[2026-04-16 Lootr chest visibility + first-chest guarantee]
+- Root cause of “zero notes in huge loot sweep”: Lootr fills `SpecialChestInventory` (the menu’s Container), not the `ChestBlockEntity` item list; injecting only the block entity never showed in the GUI.
+- LootNoteInjector now runs on `PlayerContainerEvent.Open` for `ChestMenu`, writing into `menu.getSlot(0).container` (Lootr-compatible). Vanilla double chests still get a stable key via a one-tick `pendingChestOpen` stamp from right-clicking any `ChestBlock`.
+- New config `general.guaranteeFirstLootrChest` (default true): first Lootr `SpecialChestInventory` a player opens consumes a one-shot flag and injects one weighted eligible literal part 1 (or drops near the chest if every slot is full). `/deadletters debug state` shows whether the guarantee was already used.
+- Rebuilt and installed dead_letters-1.0.jar to the lootr tests instance.

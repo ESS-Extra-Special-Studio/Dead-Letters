@@ -1,0 +1,10 @@
+{
+  "id": "code_zero_01",
+  "story": "code_zero",
+  "order": 1,
+  "title": "Day 1: Patient Zero",
+  "body": [
+    "We received the sample from the permafrost dig today. They\u2019re calling it a \"dormant prehistoric organism,\" but under the microscope, it\u2019s like nothing I\u2019ve ever seen. It doesn't just replicate; it reorganizes. We injected a dead rat as a baseline. Within ten minutes, the heart started beating again. The specimen didn't just come back to life\u2014it came back hungry."
+  ],
+  "weight": 10
+}

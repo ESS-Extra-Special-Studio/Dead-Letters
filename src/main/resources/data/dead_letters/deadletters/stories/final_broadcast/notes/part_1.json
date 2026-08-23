@@ -1,0 +1,10 @@
+{
+  "id": "final_broadcast_01",
+  "story": "final_broadcast",
+  "order": 1,
+  "title": "Day 1: Signal Lost",
+  "body": [
+    "This is Mark from Outpost 4. The satellites just went dark. One minute I was tracking the spread in Europe, the next... static. The commander says it\u2019s a solar flare, but solar flares don't make people tear their own eyes out in the streets. I\u2019m broadcasting on all emergency frequencies. If anyone hears this: stay away from the cities. The concrete is a trap."
+  ],
+  "weight": 10
+}

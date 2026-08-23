@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "uk.co.extraspecialstudio.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "dead_letters.refmap.json",
+  "mixins": [
+    "LecternBlockEntityNoteMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
