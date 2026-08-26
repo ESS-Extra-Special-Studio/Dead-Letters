@@ -1,0 +1,8 @@
+{
+  "gui.dead_letters.scrapbook.page_prev": "Previous page",
+  "gui.dead_letters.scrapbook.page_next": "Next page",
+  "item.dead_letters.note": "Dead Letter",
+  "item.dead_letters.scrapbook": "Dead Letters Scrapbook",
+  "block.dead_letters.placed_scrapbook": "Dead Letters Scrapbook",
+  "itemGroup.dead_letters.notes": "Dead Letters"
+}

@@ -1,0 +1,44 @@
+Dead Letters Implementation Plan (Forge 1.20.1 / 47.4.x)
+Last Updated: 2026-04-14
+
+Hard Rules:
+- Build a fresh jar before each gameplay test.
+- Install fresh jars to: C:/Users/Ksivi/curseforge/minecraft/Instances/lootr tests/mods
+- Keep this plan and deadletters-debug-log.txt updated as work progresses.
+- Keep logic safe on both dedicated server and client.
+
+Phases:
+1) Foundation (current)
+   - [DONE] Replace template mod code with Dead Letters core entrypoints
+   - [DONE] Add note item registration
+   - [DONE] Add shared config scaffold (spawn chance, duplicates, progression, custom story settings)
+   - [DONE] Add story/note data models
+   - [DONE] Add loader service for datapack + config story folders
+   - [DONE] Add gradle utility tasks for plan/debug + build/install loop
+
+2) Story Registry and Runtime Integration
+   - [DONE] Build merged registry with precedence rules
+   - [DONE] Validate sequences and note IDs
+   - [DONE] Add server reload hooks
+   - [TODO] Add synchronization strategy (network sync if custom screen needs richer client data)
+   - [DONE] Add per-player progression storage and duplicate prevention structures
+   - [DONE] Add first 5 built-in stories for live testing
+   - [DONE] Add player-facing custom story folder examples
+
+3) Loot and Progression Core
+   - [DONE] Inject note creation into gameplay loot flow (container-open injection path)
+   - [DONE] Build valid pool from per-story progression
+   - [DONE] Weighted selection with per-note and per-story weights
+   - [DONE] Mark discovered on read; progression on read
+   - [DONE] Added debug roll simulator and state/reset commands for fast iteration
+
+4) UI and Polish
+   - [DONE] Add note-reading screen (paginated)
+   - [DONE] Applied paper texture to note item
+   - [DONE] Creative tab lists all loaded notes with correct NoteID
+   - [TODO] Add client-side polish (optional effects toggle)
+
+5) Compatibility and Testing
+   - [IN PROGRESS] Test with Lootr + Lootr Liaison
+   - [TODO] Verify per-player behavior in multiplayer
+   - [TODO] Balance weights/spawn chance and finalize defaults

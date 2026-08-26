@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "face=floor,facing=north": { "model": "dead_letters:block/placed_note_floor", "y": 180 },
+    "face=floor,facing=south": { "model": "dead_letters:block/placed_note_floor" },
+    "face=floor,facing=west": { "model": "dead_letters:block/placed_note_floor", "y": 90 },
+    "face=floor,facing=east": { "model": "dead_letters:block/placed_note_floor", "y": 270 },
+
+    "face=ceiling,facing=north": { "model": "dead_letters:block/placed_note_floor", "x": 180, "y": 180 },
+    "face=ceiling,facing=south": { "model": "dead_letters:block/placed_note_floor", "x": 180 },
+    "face=ceiling,facing=west": { "model": "dead_letters:block/placed_note_floor", "x": 180, "y": 90 },
+    "face=ceiling,facing=east": { "model": "dead_letters:block/placed_note_floor", "x": 180, "y": 270 },
+
+    "face=wall,facing=north": { "model": "dead_letters:block/placed_note_wall", "y": 180 },
+    "face=wall,facing=south": { "model": "dead_letters:block/placed_note_wall" },
+    "face=wall,facing=west": { "model": "dead_letters:block/placed_note_wall", "y": 90 },
+    "face=wall,facing=east": { "model": "dead_letters:block/placed_note_wall", "y": 270 }
+  }
+}

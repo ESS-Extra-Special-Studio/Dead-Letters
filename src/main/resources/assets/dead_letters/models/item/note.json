@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "dead_letters:item/note_icon"
+  },
+  "overrides": [
+    { "predicate": { "custom_model_data": 1 }, "model": "dead_letters:item/note_story_t01" },
+    { "predicate": { "custom_model_data": 2 }, "model": "dead_letters:item/note_story_t02" },
+    { "predicate": { "custom_model_data": 3 }, "model": "dead_letters:item/note_story_t03" },
+    { "predicate": { "custom_model_data": 4 }, "model": "dead_letters:item/note_story_t04" },
+    { "predicate": { "custom_model_data": 5 }, "model": "dead_letters:item/note_story_t05" },
+    { "predicate": { "custom_model_data": 6 }, "model": "dead_letters:item/note_story_t06" }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "red_horizon_protocol",
+  "name": "The Red Horizon Protocol",
+  "weight": 10,
+  "max_order": 10
+}

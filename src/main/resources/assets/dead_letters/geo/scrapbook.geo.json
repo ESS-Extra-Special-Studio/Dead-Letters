@@ -1,0 +1,101 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.scrapbook",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 2,
+				"visible_bounds_height": 1.5,
+				"visible_bounds_offset": [0, 0.25, 0]
+			},
+			"bones": [
+				{
+					"name": "book",
+					"pivot": [-3.25, 2, 0]
+				},
+				{
+					"name": "spine",
+					"parent": "book",
+					"pivot": [-4, 2, 0],
+					"cubes": [
+						{"origin": [-4, 0, -4.5], "size": [1, 4, 9], "uv": [32, 27]}
+					]
+				},
+				{
+					"name": "pages",
+					"parent": "spine",
+					"pivot": [2, 0, 1.5]
+				},
+				{
+					"name": "middle page top",
+					"parent": "pages",
+					"pivot": [-2, 3.25, 0],
+					"cubes": [
+						{"origin": [-3.75119, 3.30452, -4.5], "size": [7, 0, 9], "uv": [0, 20]}
+					]
+				},
+				{
+					"name": "middle_page_top2",
+					"parent": "pages",
+					"pivot": [-2, 3.25, 0],
+					"cubes": [
+						{"origin": [-3.75119, 3.30452, -4.5], "size": [7, 0, 9], "uv": [0, 20]}
+					]
+				},
+				{
+					"name": "middle page bottom",
+					"parent": "pages",
+					"pivot": [-1.75, 0.5, 1.5],
+					"cubes": [
+						{"origin": [-3.50571, 0.36927, -4.5], "size": [7, 0, 9], "uv": [0, 10]}
+					]
+				},
+				{
+					"name": "middle_page_bottom2",
+					"parent": "pages",
+					"pivot": [-1.75, 2, 1.5],
+					"cubes": [
+						{"origin": [-3, 2, -4.5], "size": [7, 0, 9], "uv": [0, 10]}
+					]
+				},
+				{
+					"name": "top pages",
+					"parent": "pages",
+					"pivot": [-2.5, 3, 0.5],
+					"cubes": [
+						{"origin": [-3, 2, -4.5], "size": [7, 1, 9], "uv": [0, 20]},
+						{"origin": [-2, 3, -4.5], "size": [7, 0, 9], "pivot": [3, 2, 1.5], "rotation": [0, 12.5, 0], "uv": [32, 0]}
+					]
+				},
+				{
+					"name": "bottom pages",
+					"parent": "pages",
+					"pivot": [-2.75, 1, 0],
+					"cubes": [
+						{"origin": [-2.25, 1.25, -4], "size": [7, 0, 9], "pivot": [2.75, 0.25, 2], "rotation": [0, 2.5, 0], "uv": [32, 18]},
+						{"origin": [-3.25, 1, -4.75], "size": [7, 0, 9], "pivot": [1.75, 0, 1.25], "rotation": [0, -12.5, 0], "uv": [32, 9]},
+						{"origin": [-3, 1, -4.5], "size": [7, 1, 9], "uv": [0, 10]}
+					]
+				},
+				{
+					"name": "bottom cover",
+					"parent": "spine",
+					"pivot": [-3, 0, 0.5],
+					"cubes": [
+						{"origin": [-3, 0, -4.5], "size": [7, 1, 9], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "top cover",
+					"parent": "spine",
+					"pivot": [-3, 4.25, 0],
+					"cubes": [
+						{"origin": [-3, 3, -4.5], "size": [7, 1, 9], "uv": [0, 30]}
+					]
+				}
+			]
+		}
+	]
+}

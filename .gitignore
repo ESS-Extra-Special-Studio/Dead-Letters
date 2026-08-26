@@ -1,0 +1,29 @@
+# eclipse
+bin/
+*.launch
+.settings
+.metadata
+.classpath
+.project
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# gradle
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# minecraft
+run/
+runs/
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# NeoForge
+src/generated/
