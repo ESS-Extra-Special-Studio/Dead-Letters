@@ -3,7 +3,7 @@ Last Updated: 2026-04-14
 
 Hard Rules:
 - Build a fresh jar before each gameplay test.
-- Install fresh jars to: C:/Users/Ksivi/curseforge/minecraft/Instances/lootr tests/mods
+- Install fresh jars to: C:/Users/Ksivi/curseforge/minecraft/Instances/C.Ideas/mods
 - Keep this plan and deadletters-debug-log.txt updated as work progresses.
 - Keep logic safe on both dedicated server and client.
 

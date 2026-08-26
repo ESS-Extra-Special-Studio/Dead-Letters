@@ -13,9 +13,3 @@ plugins {
 }
 
 rootProject.name = 'dead-letters'
-
-includeBuild('../ESC') {
-    dependencySubstitution {
-        substitute module('uk.co.extraspecialstudio:extraspecialcore') using project(':')
-    }
-}

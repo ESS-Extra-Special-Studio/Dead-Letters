@@ -2,6 +2,11 @@
 
 All notable changes to Dead Letters will be documented in this file.
 
+## 1.0.4
+
+- Requires **Extra Special Core 2.0.0+** (range `[2.0.0,3.0)`). Compatible with ESC **2.0.1**.
+- Rebuild for the ESC 2.x pack rollout (previous CurseForge builds still declared `<2.0` and failed to load beside ESC 2.0.1).
+
 ## 1.0.3
 
 - **ESS domain swap** — Java packages moved from `uk.creatopia.unbound…` to `uk.co.extraspecialstudio…`.

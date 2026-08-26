@@ -170,9 +170,9 @@ repositories {
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
-    // flatDir {
-    //     dir 'libs'
-    // }
+    flatDir {
+        dir 'libs'
+    }
 }
 
 dependencies {
@@ -182,7 +182,8 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    implementation "uk.co.extraspecialstudio:extraspecialcore:${esc_version}"
+    // Prebuilt ESC 2.0.1 via flatDir + fg.deobf (includeBuild ESC currently fails to compile)
+    implementation fg.deobf("blank:extraspecialcore:${esc_version}+${minecraft_version}-forge")
 
     implementation fg.deobf("mod.azure.azurelib:azurelib-neo-1.20.1:3.1.8")
 
@@ -247,7 +248,7 @@ tasks.withType(JavaCompile).configureEach {
 
 def deadLettersPlanFile = file('gradle/deadletters-plan.txt')
 def deadLettersDebugFile = file('gradle/deadletters-debug-log.txt')
-def lootrTestModsDir = file('C:/Users/Ksivi/curseforge/minecraft/Instances/lootr tests/mods')
+def cIdeasTestModsDir = file('C:/Users/Ksivi/curseforge/minecraft/Instances/C.Ideas/mods')
 
 tasks.register('deadLettersPlan') {
     group = 'deadletters'
@@ -265,17 +266,24 @@ tasks.register('deadLettersDebugLog') {
     }
 }
 
-tasks.register('installToLootrTestInstance', Copy) {
+tasks.register('installToCIdeasTestInstance', Copy) {
     group = 'deadletters'
-    description = 'Copies the freshly built mod jar into the Lootr tests modpack mods folder.'
+    description = 'Copies the freshly built mod jar into the C.Ideas Forge test modpack.'
     dependsOn tasks.named('reobfJar')
     from(tasks.named('jar'))
-    into(lootrTestModsDir)
+    into(cIdeasTestModsDir)
+    doFirst {
+        delete fileTree(cIdeasTestModsDir) {
+            include "${mod_id}-*.jar"
+        }
+    }
 }
 
-tasks.register('buildAndInstallLootrTest') {
+tasks.register('buildAndInstallTest') {
     group = 'deadletters'
-    description = 'Builds a fresh jar and installs it to the Lootr tests instance.'
-    dependsOn tasks.named('clean'), tasks.named('installToLootrTestInstance')
+    description = 'Builds a fresh jar and installs it to the C.Ideas Forge test instance.'
+    dependsOn tasks.named('clean'), tasks.named('installToCIdeasTestInstance')
 }
+
+tasks.named('build').configure { finalizedBy 'installToCIdeasTestInstance' }
 
