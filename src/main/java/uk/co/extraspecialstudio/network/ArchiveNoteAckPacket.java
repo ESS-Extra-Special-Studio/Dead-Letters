@@ -2,6 +2,8 @@ package uk.co.extraspecialstudio.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import uk.co.extraspecialstudio.client.NoteScreen;
 
@@ -21,12 +23,12 @@ public record ArchiveNoteAckPacket(String noteId) {
 
     public static void handle(ArchiveNoteAckPacket packet, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.screen instanceof NoteScreen noteScreen && packet.noteId.equals(noteScreen.getNoteId())) {
                 mc.setScreen(null);
             }
-        });
+        }));
         context.setPacketHandled(true);
     }
 }

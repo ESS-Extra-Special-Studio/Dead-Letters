@@ -11,6 +11,17 @@ public final class ScrapbookUnlockHandler {
     }
 
     @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!(event.getOriginal() instanceof ServerPlayer original)) {
+            return;
+        }
+        if (!(event.getEntity() instanceof ServerPlayer clone)) {
+            return;
+        }
+        PlayerStoryData.copyPersistentData(original, clone);
+    }
+
+    @SubscribeEvent
     public static void onItemPickup(PlayerEvent.ItemPickupEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;

@@ -238,6 +238,17 @@ public final class PlayerStoryData {
         player.getPersistentData().remove(ROOT);
     }
 
+    /**
+     * Forge does not copy {@link net.minecraft.world.entity.Entity#getPersistentData()} on respawn.
+     * Call from {@link net.minecraftforge.event.entity.player.PlayerEvent.Clone}.
+     */
+    public static void copyPersistentData(ServerPlayer from, ServerPlayer to) {
+        CompoundTag root = from.getPersistentData().getCompound(ROOT);
+        if (!root.isEmpty()) {
+            to.getPersistentData().put(ROOT, root.copy());
+        }
+    }
+
     public static boolean isScrapbookUnlocked(ServerPlayer player) {
         return getOrCreateRoot(player).getBoolean(SCRAPBOOK_UNLOCKED);
     }

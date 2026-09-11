@@ -2,6 +2,8 @@ package uk.co.extraspecialstudio.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 import uk.co.extraspecialstudio.client.ScrapbookScreen;
 
@@ -28,12 +30,12 @@ public record SyncNotebookDataPacket(List<String> noteIds) {
 
     public static void handle(SyncNotebookDataPacket packet, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             Minecraft mc = Minecraft.getInstance();
             if (mc.screen instanceof ScrapbookScreen scrapbookScreen) {
                 scrapbookScreen.updateNotebookEntries(packet.noteIds);
             }
-        });
+        }));
         context.setPacketHandled(true);
     }
 }

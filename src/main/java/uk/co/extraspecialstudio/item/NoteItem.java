@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import uk.co.extraspecialstudio.Config;
 import uk.co.extraspecialstudio.block.PlacedNoteBlockEntity;
 import uk.co.extraspecialstudio.client.DeadLettersClientHooks;
 import uk.co.extraspecialstudio.registry.ModBlocks;
@@ -27,6 +28,7 @@ import uk.co.extraspecialstudio.story.StoryRegistry;
 
 public class NoteItem extends Item {
     public static final String NOTE_ID_TAG = "NoteID";
+    public static final String DISPLAY_NAME_TAG = "DeadLetterDisplayName";
 
     public NoteItem(Properties properties) {
         super(properties);
@@ -37,6 +39,9 @@ public class NoteItem extends Item {
         stack.getOrCreateTag().putString(NOTE_ID_TAG, note.id());
         int cmd = StoryRegistry.snapshot().storyTextureSlot(note.storyId());
         stack.getOrCreateTag().putInt("CustomModelData", cmd);
+        StoryDefinition story = StoryRegistry.snapshot().storiesById().get(note.storyId());
+        String storyName = story != null ? story.name() : note.storyId();
+        stack.getOrCreateTag().putString(DISPLAY_NAME_TAG, storyName + " Part " + note.order());
         return stack;
     }
 
@@ -49,6 +54,10 @@ public class NoteItem extends Item {
                 StoryDefinition story = StoryRegistry.snapshot().storiesById().get(note.storyId());
                 String storyName = story != null ? story.name() : note.storyId();
                 return Component.literal(storyName + " Part " + note.order());
+            }
+            String cached = stack.getOrCreateTag().getString(DISPLAY_NAME_TAG);
+            if (!cached.isBlank()) {
+                return Component.literal(cached);
             }
         }
         return super.getName(stack);
@@ -81,6 +90,22 @@ public class NoteItem extends Item {
         ItemStack stack = context.getItemInHand();
         if (player == null || stack.isEmpty()) {
             return InteractionResult.PASS;
+        }
+        // Plain right-click should read the letter; only sneak(+config) places it.
+        // When targeting a block, use() is not always called after useOn PASS — open here.
+        if (Config.placeNotesRequireSneak && !player.isShiftKeyDown()) {
+            String noteId = stack.getOrCreateTag().getString(NOTE_ID_TAG);
+            if (noteId.isBlank()) {
+                return InteractionResult.PASS;
+            }
+            if (level.isClientSide) {
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> DeadLettersClientHooks.openNoteScreen(noteId));
+                return InteractionResult.SUCCESS;
+            }
+            if (player instanceof ServerPlayer serverPlayer) {
+                applyServerRead(serverPlayer, noteId);
+            }
+            return InteractionResult.SUCCESS;
         }
         String noteId = stack.getOrCreateTag().getString(NOTE_ID_TAG);
         if (noteId.isBlank()) {
