@@ -1,13 +1,14 @@
 package uk.co.extraspecialstudio.network;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import uk.co.extraspecialstudio.Dead_letters;
-import uk.co.extraspecialstudio.client.ScrapbookScreen;
+import uk.co.extraspecialstudio.client.DeadLettersClientHooks;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +42,8 @@ public record SyncNotebookDataPacket(List<String> noteIds) implements CustomPack
 
     public static void handle(SyncNotebookDataPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.screen instanceof ScrapbookScreen scrapbookScreen) {
-                scrapbookScreen.updateNotebookEntries(packet.noteIds);
+            if (FMLEnvironment.dist == Dist.CLIENT) {
+                DeadLettersClientHooks.applyNotebookSync(packet.noteIds);
             }
         });
     }

@@ -122,7 +122,19 @@ public class PlacedNoteBlock extends FaceAttachedHorizontalDirectionalBlock impl
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        if (!level.isClientSide && !player.isCreative()) {
+        // Creative breaks should not drop; clear NoteID before onRemove runs.
+        if (!level.isClientSide && player.isCreative()) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof PlacedNoteBlockEntity noteBe) {
+                noteBe.setNoteId("");
+            }
+        }
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock()) && !level.isClientSide) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof PlacedNoteBlockEntity noteBe) {
                 String noteId = noteBe.getNoteId();
@@ -134,6 +146,6 @@ public class PlacedNoteBlock extends FaceAttachedHorizontalDirectionalBlock impl
                 }
             }
         }
-        return super.playerWillDestroy(level, pos, state, player);
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }

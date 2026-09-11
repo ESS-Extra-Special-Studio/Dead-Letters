@@ -94,6 +94,7 @@ public final class LootNoteInjector {
 
         RandomSource random = player.getRandom();
         Set<String> batchExcluded = new HashSet<>();
+        int remaining = Math.max(0, Config.maxNotesPerChest);
         boolean didAnything = false;
 
         if (Config.guaranteeFirstLootrChest
@@ -101,15 +102,18 @@ public final class LootNoteInjector {
                 && LootrInventorySupport.isLootrSpecialChestInventory(chestInventory)
                 && !PlayerStoryData.isFirstLootrChestGuaranteeDone(player)) {
             PlayerStoryData.markFirstLootrChestGuaranteeDone(player);
-            NoteDefinition guarantee = NoteSelector.selectEligiblePartOneExcluding(player, random, batchExcluded);
-            if (guarantee != null) {
-                ItemStack stack = noteStack(guarantee);
-                if (!tryPutInContainer(chestInventory, stack)) {
-                    spawnDropNear(player, chestInventory, stack);
+            if (remaining > 0) {
+                NoteDefinition guarantee = NoteSelector.selectEligiblePartOneExcluding(player, random, batchExcluded);
+                if (guarantee != null) {
+                    ItemStack stack = noteStack(guarantee);
+                    if (!tryPutInContainer(chestInventory, stack)) {
+                        spawnDropNear(player, chestInventory, stack);
+                    }
+                    PlayerStoryData.markAcquired(player, guarantee.id());
+                    batchExcluded.add(guarantee.id());
+                    remaining--;
+                    didAnything = true;
                 }
-                PlayerStoryData.markAcquired(player, guarantee.id());
-                batchExcluded.add(guarantee.id());
-                didAnything = true;
             }
         }
 
@@ -119,8 +123,7 @@ public final class LootNoteInjector {
 
         PlayerStoryData.markInjectedContainer(player, containerKey);
 
-        int max = Math.max(0, Config.maxNotesPerChest);
-        for (int i = 0; i < max; i++) {
+        while (remaining > 0) {
             NoteDefinition selected = NoteSelector.selectNextExcluding(player, random, batchExcluded);
             if (selected == null) {
                 break;
@@ -131,6 +134,7 @@ public final class LootNoteInjector {
             }
             PlayerStoryData.markAcquired(player, selected.id());
             batchExcluded.add(selected.id());
+            remaining--;
         }
 
         if (Config.debugTestingMode) {

@@ -2,17 +2,20 @@ package uk.co.extraspecialstudio.item;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
+import uk.co.extraspecialstudio.Config;
 
 /**
- * Places the animated scrapbook in the world, or right-click in the air to open the archive from the item in hand.
+ * Places the animated scrapbook in the world (optionally sneak-only), or right-click to open the archive.
  */
 public class ScrapbookItem extends BlockItem {
     public ScrapbookItem(Block block, Properties properties) {
@@ -34,5 +37,22 @@ public class ScrapbookItem extends BlockItem {
             }
         }
         return InteractionResultHolder.pass(stack);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        ItemStack stack = context.getItemInHand();
+        if (player != null && Config.placeScrapbookRequireSneak && !player.isShiftKeyDown()) {
+            Level level = context.getLevel();
+            if (level.isClientSide) {
+                if (FMLEnvironment.dist == Dist.CLIENT) {
+                    uk.co.extraspecialstudio.client.DeadLettersClientHooks.openScrapbookInHand(stack);
+                }
+                return InteractionResult.SUCCESS;
+            }
+            return InteractionResult.SUCCESS;
+        }
+        return super.useOn(context);
     }
 }

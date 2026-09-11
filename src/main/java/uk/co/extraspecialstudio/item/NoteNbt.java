@@ -52,6 +52,15 @@ public final class NoteNbt {
         update(stack, tag -> tag.putString(NoteItem.NOTE_ID_TAG, noteId == null ? "" : noteId));
     }
 
+    public static String getDisplayName(ItemStack stack) {
+        CompoundTag tag = get(stack);
+        return tag == null ? "" : tag.getString(NoteItem.DISPLAY_NAME_TAG);
+    }
+
+    public static void setDisplayName(ItemStack stack, String displayName) {
+        update(stack, tag -> tag.putString(NoteItem.DISPLAY_NAME_TAG, displayName == null ? "" : displayName));
+    }
+
     public static void setCustomModelData(ItemStack stack, int value) {
         stack.set(DataComponents.CUSTOM_MODEL_DATA, new CustomModelData(value));
     }

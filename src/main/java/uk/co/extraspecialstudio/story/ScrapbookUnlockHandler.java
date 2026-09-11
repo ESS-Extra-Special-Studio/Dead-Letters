@@ -3,11 +3,23 @@ package uk.co.extraspecialstudio.story;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import uk.co.extraspecialstudio.registry.ModItems;
 
 public final class ScrapbookUnlockHandler {
     private ScrapbookUnlockHandler() {
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (!(event.getOriginal() instanceof ServerPlayer original)) {
+            return;
+        }
+        if (!(event.getEntity() instanceof ServerPlayer clone)) {
+            return;
+        }
+        PlayerStoryData.copyPersistentData(original, clone);
     }
 
     @SubscribeEvent

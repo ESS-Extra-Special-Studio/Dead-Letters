@@ -8,6 +8,8 @@ import uk.co.extraspecialstudio.network.RequestNotebookDataPacket;
 import uk.co.extraspecialstudio.story.NoteDefinition;
 import uk.co.extraspecialstudio.story.StoryRegistry;
 
+import java.util.List;
+
 public final class DeadLettersClientHooks {
     private DeadLettersClientHooks() {
     }
@@ -42,5 +44,19 @@ public final class DeadLettersClientHooks {
         ScrapbookAnimationController.playOpen(mc.player, scrapbookStack);
         mc.setScreen(new ScrapbookScreen(scrapbookStack, null));
         DeadLettersNetwork.sendToServer(new RequestNotebookDataPacket());
+    }
+
+    public static void applyNotebookSync(List<String> noteIds) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof ScrapbookScreen scrapbookScreen) {
+            scrapbookScreen.updateNotebookEntries(noteIds);
+        }
+    }
+
+    public static void applyArchiveNoteAck(String noteId) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof NoteScreen noteScreen && noteId.equals(noteScreen.getNoteId())) {
+            mc.setScreen(null);
+        }
     }
 }

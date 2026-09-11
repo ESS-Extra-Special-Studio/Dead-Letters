@@ -7,7 +7,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public final class DeadLettersNetwork {
-    public static final String PROTOCOL = "1";
+    public static final String PROTOCOL = "2";
 
     private DeadLettersNetwork() {
     }
@@ -19,6 +19,7 @@ public final class DeadLettersNetwork {
         reg.playToClient(SyncNotebookDataPacket.TYPE, SyncNotebookDataPacket.STREAM_CODEC, SyncNotebookDataPacket::handle);
         reg.playToClient(ArchiveNoteAckPacket.TYPE, ArchiveNoteAckPacket.STREAM_CODEC, ArchiveNoteAckPacket::handle);
         reg.playToServer(RemoveNoteFromNotebookPacket.TYPE, RemoveNoteFromNotebookPacket.STREAM_CODEC, RemoveNoteFromNotebookPacket::handle);
+        reg.playToClient(SyncStoryRegistryPacket.TYPE, SyncStoryRegistryPacket.STREAM_CODEC, SyncStoryRegistryPacket::handle);
     }
 
     public static void sendToServer(CustomPacketPayload payload) {
@@ -27,5 +28,9 @@ public final class DeadLettersNetwork {
 
     public static void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
         PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    public static void sendToAllPlayers(CustomPacketPayload payload) {
+        PacketDistributor.sendToAllPlayers(payload);
     }
 }

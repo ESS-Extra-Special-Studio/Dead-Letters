@@ -10,8 +10,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import uk.co.extraspecialstudio.Config;
 import uk.co.extraspecialstudio.Dead_letters;
+import uk.co.extraspecialstudio.network.StoryRegistrySync;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +48,10 @@ public final class StoryReloadListener extends SimpleJsonResourceReloadListener 
 
         StoryRegistry.replace(new StoryRegistrySnapshot(mergedStories, mergedNotes));
         Dead_letters.LOGGER.info("Dead Letters registry ready: {} stories, {} notes", mergedStories.size(), mergedNotes.size());
+        // Dedicated-server clients need the same registry for names / reader / scrapbook.
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            StoryRegistrySync.sendToAll();
+        }
     }
 
     private void loadDatapackStories(Map<ResourceLocation, JsonElement> datapackFiles, Map<String, StoryDefinition> stories, Map<String, NoteDefinition> notes) {
@@ -115,6 +121,21 @@ public final class StoryReloadListener extends SimpleJsonResourceReloadListener 
             }
 
             Map<Integer, NoteDefinition> orderedNotes = new LinkedHashMap<>();
+
+            // Jar / datapack layout: storyFolder/notes/part_n.json
+            Path notesDir = storyFolder.resolve("notes");
+            if (Files.isDirectory(notesDir)) {
+                List<Path> datapackParts = Files.list(notesDir)
+                        .filter(Files::isRegularFile)
+                        .filter(path -> PART_FILE_PATTERN.matcher(path.getFileName().toString()).matches())
+                        .sorted(Comparator.comparing(path -> path.getFileName().toString()))
+                        .toList();
+                for (Path partFile : datapackParts) {
+                    ingestConfigPartFile(story.id(), partFile, orderedNotes);
+                }
+            }
+
+            // Flat config layout: storyFolder/part_n.txt|json
             List<Path> partFiles = Files.list(storyFolder)
                     .filter(Files::isRegularFile)
                     .filter(path -> path.getFileName().toString().startsWith("part_"))
@@ -122,25 +143,29 @@ public final class StoryReloadListener extends SimpleJsonResourceReloadListener 
                     .toList();
 
             for (Path partFile : partFiles) {
-                String fileName = partFile.getFileName().toString();
-                Matcher matcher = PART_FILE_PATTERN.matcher(fileName);
-                if (!matcher.matches()) {
-                    continue;
-                }
-
-                int order = Integer.parseInt(matcher.group(1));
-                String extension = matcher.group(2);
-                NoteDefinition note = "txt".equals(extension)
-                        ? parseTxtPart(story.id(), order, partFile)
-                        : parseJsonPart(story.id(), order, partFile);
-                if (note != null) {
-                    orderedNotes.put(order, note);
-                }
+                ingestConfigPartFile(story.id(), partFile, orderedNotes);
             }
 
             validateAndPublishStory(story, orderedNotes, stories, notes);
         } catch (IOException exception) {
             Dead_letters.LOGGER.error("Failed loading custom story folder {}", storyFolder, exception);
+        }
+    }
+
+    private void ingestConfigPartFile(String storyId, Path partFile, Map<Integer, NoteDefinition> orderedNotes) {
+        String fileName = partFile.getFileName().toString();
+        Matcher matcher = PART_FILE_PATTERN.matcher(fileName);
+        if (!matcher.matches()) {
+            return;
+        }
+
+        int order = Integer.parseInt(matcher.group(1));
+        String extension = matcher.group(2);
+        NoteDefinition note = "txt".equals(extension)
+                ? parseTxtPart(storyId, order, partFile)
+                : parseJsonPart(storyId, order, partFile);
+        if (note != null) {
+            orderedNotes.put(order, note);
         }
     }
 
@@ -159,6 +184,8 @@ public final class StoryReloadListener extends SimpleJsonResourceReloadListener 
         }
 
         stories.put(story.id(), story);
+        // Override replaces datapack notes for this story so orphans cannot still roll in loot.
+        notes.entrySet().removeIf(entry -> story.id().equals(entry.getValue().storyId()));
         for (NoteDefinition note : orderedNotes.values()) {
             notes.put(note.id(), note);
         }
@@ -227,10 +254,29 @@ public final class StoryReloadListener extends SimpleJsonResourceReloadListener 
     private NoteDefinition parseJsonPart(String storyId, int order, Path partFile) {
         try {
             JsonObject json = JsonParser.parseString(Files.readString(partFile)).getAsJsonObject();
+            // Datapack note JSON uses "story"; flat custom parts may omit it.
+            if (json.has("story") && !storyId.equals(json.get("story").getAsString())) {
+                Dead_letters.LOGGER.warn("Custom part {} story id '{}' does not match folder story '{}'", partFile, json.get("story").getAsString(), storyId);
+            }
             String title = json.has("title") ? json.get("title").getAsString() : "Untitled";
             int weight = json.has("weight") ? json.get("weight").getAsInt() : 1;
-            List<String> body = json.has("body") ? jsonArrayToStringList(json.getAsJsonArray("body")) : List.of();
+            List<String> body;
+            if (json.has("body")) {
+                if (json.get("body").isJsonArray()) {
+                    body = jsonArrayToStringList(json.getAsJsonArray("body"));
+                } else {
+                    body = List.of(json.get("body").getAsString());
+                }
+            } else {
+                body = List.of();
+            }
             String noteId = json.has("id") ? json.get("id").getAsString() : storyId + "_" + order;
+            if (json.has("order") && json.get("order").getAsInt() != order) {
+                Dead_letters.LOGGER.warn(
+                        "Custom part {} JSON order {} does not match filename part_{}; using filename order",
+                        partFile, json.get("order").getAsInt(), order);
+            }
+            // Continuity is keyed by filename part_N — always trust the path over JSON order.
             return new NoteDefinition(noteId, storyId, order, title, body, weight, "config:" + partFile);
         } catch (IOException exception) {
             Dead_letters.LOGGER.error("Failed parsing json part {}", partFile, exception);
