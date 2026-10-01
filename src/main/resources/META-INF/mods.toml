@@ -75,9 +75,9 @@ ordering = "AFTER"
 side = "BOTH"
 
 [[dependencies."${mod_id}"]]
-modId = "lootr_liason"
+modId = "lootr_liaison"
 mandatory = true
-versionRange = "[1.2,)"
+versionRange = "[1.3,)"
 ordering = "AFTER"
 side = "BOTH"
 

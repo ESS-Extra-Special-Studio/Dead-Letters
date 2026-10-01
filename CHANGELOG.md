@@ -1,4 +1,9 @@
-﻿## 1.0.5
+﻿## Dead Letters 1.0.6
+
+### Changed
+- Requires Lootr Liaison 1.3.0. The dependency id is now `lootr_liaison`.
+
+## 1.0.5
 
 Fixed:
 Dedicated servers sync story/note definitions to clients so letters show story name + part instead of plain "Dead Letter", and right-click reading works.
