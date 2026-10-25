@@ -1,4 +1,8 @@
-﻿## Dead Letters 1.0.6
+﻿Dead Letters 1.1.0
+Changed:
+Compatible with AzureLib 3.2.0.
+
+## Dead Letters 1.0.6
 
 ### Changed
 - Requires Lootr Liaison 1.3.0. The dependency id is now `lootr_liaison`.
